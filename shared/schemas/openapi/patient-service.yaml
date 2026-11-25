@@ -1,0 +1,225 @@
+openapi: 3.0.1
+info:
+  title: Medical Centre API
+  version: '1.0.0'
+  description: API for Medical Centre Appointment Booking System
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local development server
+
+paths:
+  /patients:
+    post:
+      summary: Register a new patient
+      operationId: registerPatient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientRegistrationRequest'
+      responses:
+        '201':
+          description: Patient registered successfully
+        '400':
+          description: Validation error - duplicate email
+
+  /patients/{id}:
+    get:
+      summary: Get patient profile
+      operationId: getPatient
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Patient profile retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientProfile'
+        '404':
+          description: Patient not found
+
+  /medics:
+    get:
+      summary: List all medics
+      operationId: listMedics
+      responses:
+        '200':
+          description: List of medics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MedicSummary'
+        '401':
+          description: Unauthorized
+
+  /medics/{id}:
+    get:
+      summary: Get medic details
+      operationId: getMedic
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Medic details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MedicDetails'
+        '404':
+          description: Medic not found
+
+  /appointments:
+    post:
+      summary: Book an appointment
+      operationId: bookAppointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentBookingRequest'
+      responses:
+        '201':
+          description: Appointment booked successfully
+        '409':
+          description: Slot already booked
+
+  /appointments/patient/{patientId}:
+    get:
+      summary: List patient appointments
+      operationId: listPatientAppointments
+      parameters:
+        - name: patientId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of patient appointments
+
+components:
+  schemas:
+    PatientRegistrationRequest:
+      type: object
+      required:
+        - email
+        - firstName
+        - lastName
+      properties:
+        email:
+          type: string
+          format: email
+        firstName:
+          type: string
+        lastName:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date
+        phone:
+          type: string
+
+    PatientProfile:
+      type: object
+      properties:
+        patientId:
+          type: string
+        email:
+          type: string
+          format: email
+        firstName:
+          type: string
+        lastName:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date
+        phone:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    MedicSummary:
+      type: object
+      required:
+        - medicId
+        - name
+        - specialization
+      properties:
+        medicId:
+          type: string
+        name:
+          type: string
+        specialization:
+          type: string
+
+    MedicDetails:
+      type: object
+      properties:
+        medicId:
+          type: string
+        name:
+          type: string
+        specialization:
+          type: string
+        qualification:
+          type: string
+        phone:
+          type: string
+
+    AppointmentBookingRequest:
+      type: object
+      required:
+        - patientId
+        - medicId
+        - appointmentDateTime
+      properties:
+        patientId:
+          type: string
+        medicId:
+          type: string
+        appointmentDateTime:
+          type: string
+          format: date-time
+
+    AppointmentDetails:
+      type: object
+      properties:
+        appointmentId:
+          type: string
+        patientId:
+          type: string
+        medicId:
+          type: string
+        appointmentDateTime:
+          type: string
+          format: date-time
+        status:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          enum: [400, 401, 404, 409, 500]
+        title:
+          type: string
+        detail:
+          type: string
+        instance:
+          type: string

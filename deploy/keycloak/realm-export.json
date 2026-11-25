@@ -1,0 +1,260 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak-realm
+  labels:
+    app: keycloak
+data:
+  realm-export.json: |
+{
+  "realm": "medical-centre",
+  "id": "1",
+  "client-Id-Mapper": false,
+  "disable-realtime-backup": false,
+  "users": [
+    {
+      "id": "patient-1",
+      "username": "patient@example.com",
+      "email": "patient@example.com",
+      "firstName": "John",
+      "lastName": "Patient",
+      "enabled": true,
+      "emailVerified": true,
+      "requiredActions": [],
+      "notBefore": 0,
+      "access": {
+        "iam": "urn:oasis:names:tc:SAML:2.0:prove:pos:delete",
+        "userType": "user"
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password123",
+          "temporary": false,
+          "hashAlgorithm": "PBKDF2",
+          "digest": "SHA-256"
+        }
+      ],
+      "attributes": {
+        "realm": ["medical-centre"]
+      }
+    },
+    {
+      "id": "admin-1",
+      "username": "admin@example.com",
+      "email": "admin@example.com",
+      "firstName": "Jane",
+      "lastName": "Admin",
+      "enabled": true,
+      "emailVerified": true,
+      "requiredActions": [],
+      "notBefore": 0,
+      "access": {
+        "iam": "urn:oasis:names:tc:SAML:2.0:prove:pos:delete",
+        "userType": "user"
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin123",
+          "temporary": false,
+          "hashAlgorithm": "PBKDF2",
+          "digest": "SHA-256"
+        }
+      ],
+      "attributes": {
+        "realm": ["medical-centre"]
+      }
+    }
+  ],
+  "clients": [
+    {
+      "id": "ms-patients-service",
+      "name": "ms-patients-service",
+      "clientId": "ms-patients-service",
+      "redirectUris": ["http://localhost:8080/*"],
+      "defaultClient": true,
+      "secret": "secret",
+      "protocol": "openid-connect",
+      "attributes": {
+        "login": "true",
+        "consent": "true",
+        "full-signed-request-object": "false"
+      },
+      "publicClient": false,
+      "surrogateAuthRequired": false,
+      "authorization": false,
+      "redirectUrisOverrides": [],
+      "webOrigins": [],
+      "defaultClientScopes": [
+        "openid",
+        "profile",
+        "email",
+        "roles"
+      ],
+      "optionalClientScopes": [
+        "roles"
+      ],
+      "ownerManagedAccessEnabled": false,
+      "consentRequired": false,
+      "attributes": {
+        "pkce.challenge.method": "S256",
+        "pkce.required": "true"
+      }
+    },
+    {
+      "id": "ms-appointments-service",
+      "name": "ms-appointments-service",
+      "clientId": "ms-appointments-service",
+      "redirectUris": ["http://localhost:8081/*"],
+      "defaultClient": false,
+      "secret": "secret",
+      "protocol": "openid-connect",
+      "attributes": {
+        "login": "true",
+        "consent": "true",
+        "full-signed-request-object": "false"
+      },
+      "publicClient": false,
+      "surrogateAuthRequired": false,
+      "authorization": false,
+      "redirectUrisOverrides": [],
+      "webOrigins": [],
+      "defaultClientScopes": [
+        "openid",
+        "profile",
+        "email",
+        "roles"
+      ],
+      "optionalClientScopes": [
+        "roles"
+      ],
+      "ownerManagedAccessEnabled": false,
+      "consentRequired": false,
+      "attributes": {
+        "pkce.challenge.method": "S256",
+        "pkce.required": "true"
+      }
+    },
+    {
+      "id": "ms-medics-service",
+      "name": "ms-medics-service",
+      "clientId": "ms-medics-service",
+      "redirectUris": ["http://localhost:8082/*"],
+      "defaultClient": false,
+      "secret": "secret",
+      "protocol": "openid-connect",
+      "attributes": {
+        "login": "true",
+        "consent": "true",
+        "full-signed-request-object": "false"
+      },
+      "publicClient": false,
+      "surrogateAuthRequired": false,
+      "authorization": false,
+      "redirectUrisOverrides": [],
+      "webOrigins": [],
+      "defaultClientScopes": [
+        "openid",
+        "profile",
+        "email",
+        "roles"
+      ],
+      "optionalClientScopes": [
+        "roles"
+      ],
+      "ownerManagedAccessEnabled": false,
+      "consentRequired": false,
+      "attributes": {
+        "pkce.challenge.method": "S256",
+        "pkce.required": "true"
+      }
+    },
+    {
+      "id": "ms-notification-service",
+      "name": "ms-notification-service",
+      "clientId": "ms-notification-service",
+      "redirectUris": ["http://localhost:8083/*"],
+      "defaultClient": false,
+      "secret": "secret",
+      "protocol": "openid-connect",
+      "attributes": {
+        "login": "true",
+        "consent": "true",
+        "full-signed-request-object": "false"
+      },
+      "publicClient": false,
+      "surrogateAuthRequired": false,
+      "authorization": false,
+      "redirectUrisOverrides": [],
+      "webOrigins": [],
+      "defaultClientScopes": [
+        "openid",
+        "profile",
+        "email",
+        "roles"
+      ],
+      "optionalClientScopes": [
+        "roles"
+      ],
+      "ownerManagedAccessEnabled": false,
+      "consentRequired": false,
+      "attributes": {
+        "pkce.challenge.method": "S256",
+        "pkce.required": "true"
+      }
+    },
+    {
+      "id": "ms-api-gateway",
+      "name": "ms-api-gateway",
+      "clientId": "ms-api-gateway",
+      "redirectUris": ["http://localhost:8080/*"],
+      "defaultClient": false,
+      "secret": "secret",
+      "protocol": "openid-connect",
+      "attributes": {
+        "login": "true",
+        "consent": "true",
+        "full-signed-request-object": "false"
+      },
+      "publicClient": false,
+      "surrogateAuthRequired": false,
+      "authorization": false,
+      "redirectUrisOverrides": [],
+      "webOrigins": [],
+      "defaultClientScopes": [
+        "openid",
+        "profile",
+        "email",
+        "roles"
+      ],
+      "optionalClientScopes": [
+        "roles"
+      ],
+      "ownerManagedAccessEnabled": false,
+      "consentRequired": false,
+      "attributes": {
+        "pkce.challenge.method": "S256",
+        "pkce.required": "true"
+      }
+    }
+  ],
+  "roles": [
+    {
+      "id": "1",
+      "name": "PATIENT",
+      "description": "Patient role",
+      "clientRole": true,
+      "container": "medical-centre",
+      "mappings": {}
+    },
+    {
+      "id": "2",
+      "name": "ADMIN",
+      "description": "Admin role",
+      "clientRole": true,
+      "container": "medical-centre",
+      "mappings": {}
+    }
+  ]
+}

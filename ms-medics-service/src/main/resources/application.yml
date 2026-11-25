@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: ms-medics-service
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://admin:password@localhost:27017/medical-centre-medics?authSource=admin}
+
+server:
+  port: 8082
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8080/auth}/realms/medical-centre
+          jwk-set-uri: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8080/auth}/realms/medical-centre/protocol/openid-connect/certs
+
+logging:
+  level:
+    com.ew.medicalcentre.medic: DEBUG

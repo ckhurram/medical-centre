@@ -1,0 +1,74 @@
+openapi: 3.0.1
+info:
+  title: Medical Centre API - All Services
+  version: '1.0.0'
+  description: Unified API specification for all microservices
+servers:
+  - url: http://localhost:8080
+    description: API Gateway
+
+paths:
+  /patients:
+    post:
+      summary: Register a new patient
+      operationId: registerPatient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientRegistrationRequest'
+      responses:
+        '201':
+          description: Patient registered
+
+  /medics:
+    get:
+      summary: List medics
+      operationId: listMedics
+      responses:
+        '200':
+          description: List of medics
+
+  /appointments:
+    post:
+      summary: Book an appointment
+      operationId: bookAppointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentBookingRequest'
+      responses:
+        '201':
+          description: Appointment booked
+
+components:
+  schemas:
+    PatientRegistrationRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        firstName:
+          type: string
+        lastName:
+          type: string
+        dateOfBirth:
+          type: string
+          format: date
+        phone:
+          type: string
+
+    AppointmentBookingRequest:
+      type: object
+      properties:
+        patientId:
+          type: string
+        medicId:
+          type: string
+        appointmentDateTime:
+          type: string
+          format: date-time

@@ -1,0 +1,12 @@
+{
+  "type": "record",
+  "name": "MedicAvailabilityUpdated",
+  "namespace": "com.ew.medicalcentre.events.medic",
+  "fields": [
+    {"name": "medicId", "type": "string"},
+    {"name": "isAvailable", "type": "boolean"},
+    {"name": "effectiveFrom", "type": "long", "logicalType": "timestamp-millis"},
+    {"name": "effectiveTo", "type": "long", "logicalType": "timestamp-millis"},
+    {"name": "occurredAt", "type": "long", "logicalType": "timestamp-millis"}
+  ]
+}

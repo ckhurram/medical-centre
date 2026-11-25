@@ -1,0 +1,13 @@
+{
+  "type": "record",
+  "name": "AppointmentBooked",
+  "namespace": "com.ew.medicalcentre.events.appointment",
+  "fields": [
+    {"name": "appointmentId", "type": "string"},
+    {"name": "patientId", "type": "string"},
+    {"name": "medicId", "type": "string"},
+    {"name": "appointmentDateTime", "type": "long", "logicalType": "timestamp-millis"},
+    {"name": "status", "type": "string"},
+    {"name": "occurredAt", "type": "long", "logicalType": "timestamp-millis"}
+  ]
+}

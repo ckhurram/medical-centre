@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: ms-appointments-service
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://admin:password@localhost:27017/medical-centre-appointments?authSource=admin}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: appointments-service
+      auto-offset-reset: earliest
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+server:
+  port: 8081
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8080/auth}/realms/medical-centre
+          jwk-set-uri: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8080/auth}/realms/medical-centre/protocol/openid-connect/certs
+
+logging:
+  level:
+    com.ew.medicalcentre.appointment: DEBUG

@@ -1,0 +1,14 @@
+{
+  "type": "record",
+  "name": "PatientRegistered",
+  "namespace": "com.ew.medicalcentre.events.patient",
+  "fields": [
+    {"name": "patientId", "type": "string"},
+    {"name": "email", "type": "string"},
+    {"name": "firstName", "type": "string"},
+    {"name": "lastName", "type": "string"},
+    {"name": "dateOfBirth", "type": "string"},
+    {"name": "phone", "type": "string"},
+    {"name": "occurredAt", "type": "long", "logicalType": "timestamp-millis"}
+  ]
+}

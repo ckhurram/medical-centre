@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+    <!--
+    Add suppressions for false-positive vulnerabilities here.
+
+    Example:
+    <suppress>
+        <notes><![CDATA[False positive - not used in our context]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.example/example@.*$</packageUrl>
+        <vulnerabilityName>CVE-2024-XXXX</vulnerabilityName>
+    </suppress>
+    -->
+</suppressions>

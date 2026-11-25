@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.ew.medicalcentre</groupId>
+    <artifactId>medical-centre</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <name>Medical Centre Appointment Booking System</name>
+    <description>
+        Multi-module microservices platform for patient appointment booking
+        using DDD, EDA, Kafka, MongoDB, Spring Boot, and Java 25.
+    </description>
+
+    <modules>
+        <module>ms-patients-service</module>
+        <module>ms-medics-service</module>
+        <module>ms-appointments-service</module>
+        <module>ms-notification-service</module>
+        <module>acceptance-test</module>
+    </modules>
+
+    <properties>
+        <java.version>25</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <spring-boot.version>4.2.0</spring-boot.version>
+        <spring-cloud.version>2025.0.0</spring-cloud.version>
+        <jacoco.version>0.8.14</jacoco.version>
+        <jacoco.min-instruction>0.80</jacoco.min-instruction>
+        <jacoco.min-branch>0.80</jacoco.min-branch>
+        <jacoco.min-complexity>0.80</jacoco.min-complexity>
+        <jacoco.min-line>0.80</jacoco.min-line>
+        <jacoco.min-method>0.80</jacoco.min-method>
+        <jacoco.min-class>0.80</jacoco.min-class>
+        <cucumber.version>7.33.0</cucumber.version>
+        <rest-assured.version>5.5.0</rest-assured.version>
+        <playwright.version>1.65.1</playwright.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Spring Boot BOM -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Spring Cloud BOM -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Cucumber BDD -->
+            <dependency>
+                <groupId>io.cucumber</groupId>
+                <artifactId>cucumber-bom</artifactId>
+                <version>${cucumber.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Rest Assured for API BDD -->
+            <dependency>
+                <groupId>io.rest-assured</groupId>
+                <artifactId>rest-assured</artifactId>
+                <version>${rest-assured.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- Playwright for E2E Acceptance -->
+            <dependency>
+                <groupId>com.microsoft.playwright</groupId>
+                <artifactId>playwright</artifactId>
+                <version>${playwright.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring-boot.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.13.0</version>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>11.1.0</version>
+                    <configuration>
+                        <format>XML,HTML</format>
+                        <failBuildOnCVSS>7</failBuildOnCVSS>
+                        <suppressionFile>owasp-suppressions.xml</suppressionFile>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco.version}</version>
+                    <executions>
+                        <execution>
+                            <id>default-prepare-agent</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>default-report</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>default-check</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                            <configuration>
+                                <rules>
+                                    <rule>
+                                        <element>BUNDLE</element>
+                                        <limits>
+                                            <limit>
+                                                <counter>INSTRUCTION</counter>
+                                                <value>COVEREDRATIO</value>
+                                                <minimum>${jacoco.min-instruction}</minimum>
+                                            </limit>
+                                            <limit>
+                                                <counter>BRANCH</counter>
+                                                <value>COVEREDRATIO</value>
+                                                <minimum>${jacoco.min-branch}</minimum>
+                                            </limit>
+                                            <limit>
+                                                <counter>COMPLEXITY</counter>
+                                                <value>COVEREDRATIO</value>
+                                                <minimum>${jacoco.min-complexity}</minimum>
+                                            </limit>
+                                            <limit>
+                                                <counter>LINE</counter>
+                                                <value>COVEREDRATIO</value>
+                                                <minimum>${jacoco.min-line}</minimum>
+                                            </limit>
+                                            <limit>
+                                                <counter>METHOD</counter>
+                                                <value>COVEREDRATIO</value>
+                                                <minimum>${jacoco.min-method}</minimum>
+                                            </limit>
+                                            <limit>
+                                                <counter>CLASS</counter>
+                                                <value>COVEREDRATIO</value>
+                                                <minimum>${jacoco.min-class}</minimum>
+                                            </limit>
+                                        </limits>
+                                    </rule>
+                                </rules>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <!-- OWASP Dependency Check - CVE vulnerability scanning -->
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+            </plugin>
+            <!-- JaCoCo Code Coverage - 80% threshold on all counters -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>docker</id>
+            <properties>
+                <spring.profiles.active>docker</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>security-scan</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

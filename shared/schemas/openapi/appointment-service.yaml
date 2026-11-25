@@ -1,0 +1,149 @@
+openapi: 3.0.1
+info:
+  title: Medical Centre API - Appointment Service
+  version: '1.0.0'
+  description: Appointment booking and management API
+servers:
+  - url: http://localhost:8081
+    description: Local development server
+
+paths:
+  /api/v1/appointments:
+    post:
+      summary: Book an appointment
+      operationId: bookAppointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentBookingRequest'
+      responses:
+        '201':
+          description: Appointment booked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentDetails'
+        '409':
+          description: Slot already booked
+
+  /api/v1/appointments/{id}:
+    get:
+      summary: Get appointment details
+      operationId: getAppointment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Appointment details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentDetails'
+        '404':
+          description: Appointment not found
+
+    put:
+      summary: Update appointment
+      operationId: updateAppointment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentUpdateRequest'
+      responses:
+        '200':
+          description: Appointment updated
+
+    delete:
+      summary: Cancel appointment
+      operationId: cancelAppointment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Appointment cancelled
+
+  /api/v1/appointments/patient/{patientId}:
+    get:
+      summary: List patient appointments
+      operationId: listPatientAppointments
+      parameters:
+        - name: patientId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of patient appointments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AppointmentDetails'
+
+components:
+  schemas:
+    AppointmentBookingRequest:
+      type: object
+      required:
+        - patientId
+        - medicId
+        - appointmentDateTime
+      properties:
+        patientId:
+          type: string
+        medicId:
+          type: string
+        appointmentDateTime:
+          type: string
+          format: date-time
+
+    AppointmentUpdateRequest:
+      type: object
+      properties:
+        appointmentDateTime:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [PENDING, CONFIRMED, CANCELLED, COMPLETED]
+
+    AppointmentDetails:
+      type: object
+      properties:
+        appointmentId:
+          type: string
+        patientId:
+          type: string
+        medicId:
+          type: string
+        appointmentDateTime:
+          type: string
+          format: date-time
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time

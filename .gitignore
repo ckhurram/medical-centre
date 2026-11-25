@@ -1,0 +1,58 @@
+# Java / Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+.mvn/
+mvnw
+mvnw.cmd
+.gradle/
+build/
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/settings.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env / secrets
+.env
+.env.local
+*.secret
+credentials.json
+
+# Logs
+*.log
+logs/
+
+# Docker
+.dockerignore
+
+# IDE
+*.swp
+*.swo
+*~
+
+# Test coverage
+coverage/
+coverage-final.json
+lcov.info
+**/jacoco*.exec
+
+# Node
+node_modules/
+package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+build/
+.next/
+
+# TypeScript
+*.tsbuildinfo

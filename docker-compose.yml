@@ -1,0 +1,181 @@
+version: '3.9'
+
+services:
+  # ──────────────────────────────────────────────
+  # Message Broker
+  # ──────────────────────────────────────────────
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_CLIENT_HOST: zookeeper
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+
+  # ──────────────────────────────────────────────
+  # Database
+  # ──────────────────────────────────────────────
+  mongodb:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb-data:/data/db
+
+  # ──────────────────────────────────────────────
+  # Identity Provider
+  # ──────────────────────────────────────────────
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: dev-file
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./deploy/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ──────────────────────────────────────────────
+  # Observability
+  # ──────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./shared/observability/prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    image: grafana/grafana-enterprise:latest
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    depends_on:
+      - prometheus
+
+  # ──────────────────────────────────────────────
+  # Backend Services
+  # ──────────────────────────────────────────────
+  ms-api-gateway:
+    build:
+      context: ./ms-api-gateway
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080/auth
+      - PATIENTS_SERVICE_URL=http://ms-patients-service:8080
+      - MEDICS_SERVICE_URL=http://ms-medics-service:8082
+      - APPOINTMENTS_SERVICE_URL=http://ms-appointments-service:8081
+    ports:
+      - "8080:8080"
+    depends_on:
+      - keycloak
+
+  ms-identity-service:
+    build:
+      context: ./ms-identity-service
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080/auth
+    ports:
+      - "8084:8084"
+    depends_on:
+      - keycloak
+
+  ms-patients-service:
+    build:
+      context: ./ms-patients-service
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017/medical-centre-patients?authSource=admin
+      - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080/auth
+    ports:
+      - "8081:8080"
+    depends_on:
+      - kafka
+      - mongodb
+      - keycloak
+
+  ms-medics-service:
+    build:
+      context: ./ms-medics-service
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017/medical-centre-medics?authSource=admin
+      - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080/auth
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mongodb
+      - keycloak
+
+  ms-appointments-service:
+    build:
+      context: ./ms-appointments-service
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017/medical-centre-appointments?authSource=admin
+      - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080/auth
+    ports:
+      - "8083:8081"
+    depends_on:
+      - kafka
+      - mongodb
+      - keycloak
+
+  ms-notification-service:
+    build:
+      context: ./ms-notification-service
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    ports:
+      - "8084:8083"
+    depends_on:
+      - kafka
+
+  # ──────────────────────────────────────────────
+  # Frontend
+  # ──────────────────────────────────────────────
+  medical-centre-ui:
+    build:
+      context: ./medical-centre-ui
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    environment:
+      - REACT_APP_API_BASE_URL=http://localhost:8080
+    depends_on:
+      - ms-api-gateway
+
+volumes:
+  mongodb-data:

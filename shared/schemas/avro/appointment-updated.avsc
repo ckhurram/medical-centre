@@ -1,0 +1,11 @@
+{
+  "type": "record",
+  "name": "AppointmentUpdated",
+  "namespace": "com.ew.medicalcentre.events.appointment",
+  "fields": [
+    {"name": "appointmentId", "type": "string"},
+    {"name": "newStatus", "type": "string"},
+    {"name": "updatedBy", "type": "string"},
+    {"name": "occurredAt", "type": "long", "logicalType": "timestamp-millis"}
+  ]
+}

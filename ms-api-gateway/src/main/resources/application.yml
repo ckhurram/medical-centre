@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: ms-api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+      routes:
+        - id: patients-route
+          uri: ${PATIENTS_SERVICE_URL:http://localhost:8080}
+          predicates:
+            - Path=/api/v1/patients/**
+          filters:
+            - StripPrefix=2
+        - id: medics-route
+          uri: ${MEDICS_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/v1/medics/**
+          filters:
+            - StripPrefix=2
+        - id: appointments-route
+          uri: ${APPOINTMENTS_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/v1/appointments/**
+          filters:
+            - StripPrefix=2
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,gateway
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8080/auth}/realms/medical-centre
+          jwk-set-uri: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8080/auth}/realms/medical-centre/protocol/openid-connect/certs
+
+logging:
+  level:
+    com.ew.medicalcentre.gateway: DEBUG
+    org.springframework.cloud.gateway: INFO
