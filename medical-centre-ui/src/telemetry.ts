@@ -10,18 +10,18 @@ import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch';
 import { DocumentLoadInstrumentation } from '@opentelemetry/instrumentation-document-load';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { Resource } from '@opentelemetry/resources';
-import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION, ATTR_DEPLOYMENT_ENVIRONMENT } from '@opentelemetry/semantic-conventions';
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
 
 // Initialize the context manager for async propagation
 const zoneContextManager = new ZoneContextManager();
 zoneContextManager.enable();
 
-// Create resource with service metadata
+// Create resource with service metadata.
+// Plain string keys are used for portability across @opentelemetry/semantic-conventions versions.
 const resource = new Resource({
-  [ATTR_SERVICE_NAME]: 'medical-centre-ui',
-  [ATTR_SERVICE_VERSION]: '1.0.0',
-  [ATTR_DEPLOYMENT_ENVIRONMENT]: import.meta.env.MODE || 'development',
+  'service.name': 'medical-centre-ui',
+  'service.version': '1.0.0',
+  'deployment.environment': import.meta.env.MODE || 'development',
 });
 
 // Configure OTLP HTTP exporter to send traces to OpenTelemetry Collector
