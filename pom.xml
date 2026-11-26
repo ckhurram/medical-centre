@@ -20,6 +20,8 @@
         <module>ms-medics-service</module>
         <module>ms-appointments-service</module>
         <module>ms-notification-service</module>
+        <module>ms-api-gateway</module>
+        <module>ms-identity-service</module>
         <module>acceptance-test</module>
     </modules>
 
