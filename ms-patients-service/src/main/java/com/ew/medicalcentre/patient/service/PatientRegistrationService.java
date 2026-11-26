@@ -1,16 +1,21 @@
 package com.ew.medicalcentre.patient.service;
 
-import com.ew.medicalcentre.patient.dto.*;
-import com.ew.medicalcentre.patient.model.Patient;
-import com.ew.medicalcentre.patient.model.Email;
-import com.ew.medicalcentre.patient.model.PhoneNumber;
-import com.ew.medicalcentre.patient.repository.PatientRepository;
+import com.ew.medicalcentre.patient.dto.PatientProfileResponse;
+import com.ew.medicalcentre.patient.dto.PatientRegistrationRequest;
 import com.ew.medicalcentre.patient.event.PatientEventPublisher;
 import com.ew.medicalcentre.patient.event.PatientRegisteredEvent;
 import com.ew.medicalcentre.patient.exception.PatientAlreadyExistsException;
-import com.ew.medicalcentre.patient.exception.PatientNotFoundException;
+import com.ew.medicalcentre.patient.model.Patient;
+import com.ew.medicalcentre.patient.repository.PatientRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+/**
+ * Service responsible for patient registration.
+ * Validates uniqueness, persists the patient, and publishes the registration event.
+ */
 @Service
 public class PatientRegistrationService {
 
@@ -25,6 +30,7 @@ public class PatientRegistrationService {
 
     /**
      * Registers a new patient with the given registration request.
+     *
      * @param request the registration request containing patient details
      * @return the patient profile response
      * @throws PatientAlreadyExistsException if the email is already registered
@@ -35,53 +41,39 @@ public class PatientRegistrationService {
             throw new PatientAlreadyExistsException("Email already registered: " + request.getEmail());
         }
 
-        // Map to Patient entity
-        Patient patient = new Patient();
-        patient.setEmail(request.getEmail());
-        patient.setFirstName(request.getFirstName());
-        patient.setLastName(request.getLastName());
-
-        // Parse date of birth (assuming ISO-8601 format)
-        try {
-            java.time.LocalDate dob = java.time.LocalDate.parse(request.getDateOfBirth());
-            patient.setDateOfBirth(dob);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid date of birth format: " + request.getDateOfBirth());
-        }
-
-        // Parse phone using PhoneNumber value object
-        try {
-            PhoneNumber phone = new PhoneNumber(request.getPhone());
-            patient.setPhone(phone.getValue());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid phone number format: " + request.getPhone());
-        }
-
-        // Set timestamps
-        patient.setCreatedAt(java.time.LocalDateTime.now());
-        patient.setUpdatedAt(java.time.LocalDateTime.now());
+        // Build Patient record from request data (patientId + timestamps auto-generated)
+        Patient patient = new Patient(
+                null,
+                request.getEmail(),
+                request.getFirstName(),
+                request.getLastName(),
+                LocalDate.parse(request.getDateOfBirth()),
+                request.getPhone(),
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
 
         // Save to MongoDB
         Patient savedPatient = patientRepository.save(patient);
 
-        // Build profile response
+        // Build profile response (record accessors)
         PatientProfileResponse response = new PatientProfileResponse(
-                savedPatient.getPatientId(),
-                savedPatient.getEmail(),
-                savedPatient.getFirstName(),
-                savedPatient.getLastName(),
-                savedPatient.getDateOfBirth() != null ? savedPatient.getDateOfBirth().toString() : "",
-                savedPatient.getPhone() != null ? savedPatient.getPhone() : "",
-                savedPatient.getCreatedAt());
+                savedPatient.patientId(),
+                savedPatient.email(),
+                savedPatient.firstName(),
+                savedPatient.lastName(),
+                savedPatient.dateOfBirth() != null ? savedPatient.dateOfBirth().toString() : "",
+                savedPatient.phone() != null ? savedPatient.phone() : "",
+                savedPatient.createdAt());
 
         // Publish event
         PatientRegisteredEvent event = new PatientRegisteredEvent(
-                savedPatient.getPatientId(),
-                savedPatient.getEmail(),
-                savedPatient.getFirstName(),
-                savedPatient.getLastName(),
-                savedPatient.getDateOfBirth() != null ? savedPatient.getDateOfBirth().toString() : "",
-                savedPatient.getPhone() != null ? savedPatient.getPhone() : "");
+                savedPatient.patientId(),
+                savedPatient.email(),
+                savedPatient.firstName(),
+                savedPatient.lastName(),
+                savedPatient.dateOfBirth() != null ? savedPatient.dateOfBirth().toString() : "",
+                savedPatient.phone() != null ? savedPatient.phone() : "");
 
         patientEventPublisher.publishPatientRegistered(event);
 

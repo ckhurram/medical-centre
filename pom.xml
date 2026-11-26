@@ -43,6 +43,7 @@
         <cucumber.version>7.33.0</cucumber.version>
         <rest-assured.version>5.5.0</rest-assured.version>
         <playwright.version>1.65.1</playwright.version>
+        <lombok.version>1.18.42</lombok.version>
     </properties>
 
     <dependencyManagement>
@@ -70,6 +71,15 @@
                 <groupId>io.cucumber</groupId>
                 <artifactId>cucumber-bom</artifactId>
                 <version>${cucumber.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Lombok -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

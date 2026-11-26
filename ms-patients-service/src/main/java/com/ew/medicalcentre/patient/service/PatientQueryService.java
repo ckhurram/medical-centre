@@ -41,13 +41,13 @@ public class PatientQueryService {
 
     private PatientProfileResponse mapToProfileResponse(Patient patient) {
         PatientProfileResponse response = new PatientProfileResponse(
-                patient.getPatientId(),
-                patient.getEmail(),
-                patient.getFirstName(),
-                patient.getLastName(),
-                patient.getDateOfBirth() != null ? patient.getDateOfBirth().toString() : "",
-                patient.getPhone() != null ? patient.getPhone() : "",
-                patient.getCreatedAt());
+                patient.patientId(),
+                patient.email(),
+                patient.firstName(),
+                patient.lastName(),
+                patient.dateOfBirth() != null ? patient.dateOfBirth().toString() : "",
+                patient.phone() != null ? patient.phone() : "",
+                patient.createdAt());
         return response;
     }
 }
