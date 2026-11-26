@@ -1,3 +1,5 @@
+package com.ew.medicalcentre.acceptance;
+
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import org.junit.jupiter.api.*;

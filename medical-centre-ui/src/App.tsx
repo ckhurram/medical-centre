@@ -1,17 +1,26 @@
-/**
- * Minimal App component - placeholder for UI implementation
- * Replace with actual application routing and components
+/*
+ * Minimal App component - registers routes for the Medical Centre application.
+ * IMPORTANT: telemetry.ts must be imported FIRST in main.tsx before any other imports.
  */
 import React from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import './index.css';
+
+import LoginPage from './pages/LoginPage';
+import RegisterPatient from './pages/RegisterPatient';
+import AdminDashboard from './pages/AdminDashboard';
+import AppointmentsPage from './pages/AppointmentsPage';
 
 function App() {
   return (
-    <div style={{ padding: '2rem', fontFamily: 'system-ui, sans-serif' }}>
-      <h1>Medical Centre Appointment Booking</h1>
-      <p>OpenTelemetry tracing is active. Check traces in Jaeger at <a href="http://localhost:16686" target="_blank" rel="noopener noreferrer">http://localhost:16686</a></p>
-      <p>Metrics in Grafana at <a href="http://localhost:3001" target="_blank" rel="noopener noreferrer">http://localhost:3001</a></p>
-      <p>Logs in Loki via Grafana Explore</p>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LoginPage />} exact={true} />
+        <Route path="/register" element={<RegisterPatient />} />
+        <Route path="/dashboard" element={<AdminDashboard />} />
+        <Route path="/appointments" element={<AppointmentsPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
