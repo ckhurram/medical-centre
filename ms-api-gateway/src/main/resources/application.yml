@@ -25,15 +25,30 @@ spring:
             - Path=/api/v1/appointments/**
           filters:
             - StripPrefix=2
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8080/auth}/realms/medical-centre
+          jwk-set-uri: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8080/auth}/realms/medical-centre/protocol/openid-connect/certs
 
 server:
   port: 8080
 
 management:
+  tracing:
+    sampling:
+      probability: 1.0
+    otlp:
+      tracing:
+        endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318/v1/traces}
+  metrics:
+    tags:
+      application: ${spring.application.name}
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,gateway
+        include: health,info,metrics,gateway,prometheus
 
 springdoc:
   api-docs:
@@ -41,14 +56,6 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui.html
-
-spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8080/auth}/realms/medical-centre
-          jwk-set-uri: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8080/auth}/realms/medical-centre/protocol/openid-connect/certs
 
 logging:
   level:

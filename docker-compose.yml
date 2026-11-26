@@ -47,7 +47,7 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin
       KC_DB: dev-file
     ports:
-      - "8080:8080"
+      - "8180:8080"
     volumes:
       - ./deploy/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
     healthcheck:
@@ -57,23 +57,86 @@ services:
       retries: 5
 
   # ──────────────────────────────────────────────
-  # Observability
+  # Observability Stack
   # ──────────────────────────────────────────────
+  # OpenTelemetry Collector — receives OTLP traces/metrics, fans out to Jaeger & Prometheus
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.122.0
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    volumes:
+      - ./shared/observability/otel-collector-config.yml:/etc/otelcol-contrib/config.yaml
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "8889:8889"   # Prometheus metrics exporter
+      - "13133:13133" # Health check
+    depends_on:
+      - jaeger
+
+  # Grafana Loki — log aggregation
+  loki:
+    image: grafana/loki:3.1.0
+    command: ["-config.file=/etc/loki/loki-config.yml"]
+    volumes:
+      - ./shared/observability/loki-config.yml:/etc/loki/loki-config.yml
+    ports:
+      - "3100:3100"
+    volumes:
+      - loki-data:/loki
+
+  # Promtail — ships container logs to Loki
+  promtail:
+    image: grafana/promtail:3.1.0
+    command: ["-config.file=/etc/promtail/promtail-config.yml"]
+    volumes:
+      - ./shared/observability/promtail-config.yml:/etc/promtail/promtail-config.yml
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    depends_on:
+      - loki
+
+  # Jaeger — distributed trace storage & UI
+  jaeger:
+    image: jaegertracing/all-in-one:1.58
+    ports:
+      - "16686:16686" # Jaeger UI
+      - "4317:4317"   # OTLP gRPC (for collector -> jaeger)
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+      SPAN_STORAGE_TYPE: badger
+    volumes:
+      - jaeger-data:/var/lib/jaeger
+
+  # Prometheus — metrics collection
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v2.54.0
     ports:
       - "9090:9090"
     volumes:
       - ./shared/observability/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-lifecycle'
 
+  # Grafana — dashboards & datasources (pre-provisioned)
   grafana:
-    image: grafana/grafana-enterprise:latest
+    image: grafana/grafana-enterprise:11.0.0
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: grafana-piechart-panel
+    volumes:
+      - ./shared/observability/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./shared/observability/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./shared/observability/grafana/dashboards:/etc/grafana/provisioning/dashboards/medical-centre
+      - grafana-data:/var/lib/grafana
     depends_on:
       - prometheus
+      - loki
+      - jaeger
 
   # ──────────────────────────────────────────────
   # Backend Services
@@ -88,10 +151,12 @@ services:
       - PATIENTS_SERVICE_URL=http://ms-patients-service:8080
       - MEDICS_SERVICE_URL=http://ms-medics-service:8082
       - APPOINTMENTS_SERVICE_URL=http://ms-appointments-service:8081
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318/v1/traces
     ports:
       - "8080:8080"
     depends_on:
       - keycloak
+      - otel-collector
 
   ms-identity-service:
     build:
@@ -100,10 +165,12 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080/auth
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318/v1/traces
     ports:
       - "8084:8084"
     depends_on:
       - keycloak
+      - otel-collector
 
   ms-patients-service:
     build:
@@ -114,12 +181,14 @@ services:
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - MONGODB_URI=mongodb://admin:password@mongodb:27017/medical-centre-patients?authSource=admin
       - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080/auth
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318/v1/traces
     ports:
       - "8081:8080"
     depends_on:
       - kafka
       - mongodb
       - keycloak
+      - otel-collector
 
   ms-medics-service:
     build:
@@ -129,11 +198,13 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - MONGODB_URI=mongodb://admin:password@mongodb:27017/medical-centre-medics?authSource=admin
       - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080/auth
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318/v1/traces
     ports:
       - "8082:8082"
     depends_on:
       - mongodb
       - keycloak
+      - otel-collector
 
   ms-appointments-service:
     build:
@@ -144,12 +215,14 @@ services:
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
       - MONGODB_URI=mongodb://admin:password@mongodb:27017/medical-centre-appointments?authSource=admin
       - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080/auth
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318/v1/traces
     ports:
       - "8083:8081"
     depends_on:
       - kafka
       - mongodb
       - keycloak
+      - otel-collector
 
   ms-notification-service:
     build:
@@ -158,10 +231,12 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318/v1/traces
     ports:
-      - "8084:8083"
+      - "8085:8083"
     depends_on:
       - kafka
+      - otel-collector
 
   # ──────────────────────────────────────────────
   # Frontend
@@ -174,8 +249,14 @@ services:
       - "3000:80"
     environment:
       - REACT_APP_API_BASE_URL=http://localhost:8080
+      - VITE_OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318/v1/traces
     depends_on:
       - ms-api-gateway
+      - otel-collector
 
 volumes:
   mongodb-data:
+  loki-data:
+  jaeger-data:
+  prometheus-data:
+  grafana-data:

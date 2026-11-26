@@ -131,7 +131,17 @@ medical-centre/
 │   │   ├── topics/
 │   │   └── config/
 │   └── observability/
-│       └── prometheus.yml
+│       ├── README.md                  # Observability stack docs
+│       ├── otel-collector-config.yml  # OpenTelemetry Collector pipeline
+│       ├── loki-config.yml            # Grafana Loki config
+│       ├── prometheus.yml             # Prometheus scrape targets
+│       ├── promtail-config.yml        # Ship Docker logs to Loki
+│       └── grafana/
+│           ├── provisioning/
+│           │   ├── datasources/
+│           │   └── dashboards/
+│           └── dashboards/
+│               └── medical-centre-health.json
 │
 ├── docs/
 │   ├── adr/                           # Architecture Decision Records
@@ -177,7 +187,37 @@ medical-centre/
 | Auth | Keycloak (OAuth2/OIDC) |
 | Containerization | Docker, Docker Compose |
 | CI/CD | GitHub Actions |
-| Observability | Prometheus, Grafana, OpenTelemetry |
+| Observability | OpenTelemetry, Micrometer, Jaeger, Prometheus, Loki, Grafana |
+
+## Observability
+
+The system ships with a full OpenTelemetry-based observability stack — distributed tracing from the UI through the API Gateway to every service, metrics via Micrometer + Prometheus, and logs aggregated in Loki.
+
+### Signal flow
+
+| Signal | Producer | Storage |
+|--------|----------|---------|
+| **Traces** | OTel JS (UI) + OTel Java agent (services) | Jaeger |
+| **Metrics** | Micrometer → `/actuator/prometheus` | Prometheus |
+| **Logs** | Docker container stdout | Promtail → Grafana Loki |
+
+Traces flow through an **OpenTelemetry Collector** (`otel-collector:4318`) which fans out to Jaeger and Prometheus.
+
+### Access (local docker-compose)
+
+| Service | URL |
+|---------|-----|
+| Grafana (dashboards) | http://localhost:3001 (admin / admin) |
+| Jaeger (traces) | http://localhost:16686 |
+| Prometheus (metrics) | http://localhost:9090 |
+
+### Grafana dashboard
+
+Pre-provisioned **"Medical Centre — Services Health"** dashboard shows per-service status, request rate, error rate, latency p50/p95/p99, JVM heap, GC pause, and recent error logs. See [shared/observability/README.md](shared/observability/README.md) for details.
+
+### Trace propagation
+
+A single request is traced end-to-end: **UI** sends the W3C `traceparent` header → **API Gateway** → **domain service**. Spring Boot services use `micrometer-tracing-bridge-otel` for automatic W3C propagation.
 
 ## Testing
 

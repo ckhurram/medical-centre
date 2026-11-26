@@ -1,38 +1,48 @@
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
+  external_labels:
+    cluster: medical-centre
+    environment: local
 
 scrape_configs:
+  # ─── Domain services (Spring Boot Actuator + Micrometer) ───
   - job_name: 'ms-patients-service'
-    kubernetes_sd_configs:
-      - role: pod
-    relabel_configs:
-      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
-        action: keep
-  - job_name: 'ms-appointments-service'
-    kubernetes_sd_configs:
-      - role: pod
-    relabel_configs:
-      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
-        action: keep
-  - job_name: 'ms-medics-service'
-    kubernetes_sd_configs:
-      - role: pod
-    relabel_configs:
-      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
-        action: keep
-  - job_name: 'ms-notification-service'
-    kubernetes_sd_configs:
-      - role: pod
-    relabel_configs:
-      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
-        action: keep
-  - job_name: 'ms-api-gateway'
-    kubernetes_sd_configs:
-      - role: pod
-    relabel_configs:
-      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
-        action: keep
-  - job_name: 'keycloak'
+    metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['keycloak:8080']
+      - targets: ['ms-patients-service:8080']
+
+  - job_name: 'ms-medics-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['ms-medics-service:8082']
+
+  - job_name: 'ms-appointments-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['ms-appointments-service:8081']
+
+  - job_name: 'ms-notification-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['ms-notification-service:8083']
+
+  - job_name: 'ms-api-gateway'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['ms-api-gateway:8080']
+
+  - job_name: 'ms-identity-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['ms-identity-service:8084']
+
+  # ─── OpenTelemetry Collector (OTLP metric export endpoint) ───
+  - job_name: 'otel-collector'
+    static_configs:
+      - targets: ['otel-collector:8889']
+
+  # ─── Infrastructure ───
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
