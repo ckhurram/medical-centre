@@ -35,7 +35,7 @@ public class PatientController {
     public ResponseEntity<PatientProfileResponse> registerPatient(
             @Valid @RequestBody PatientRegistrationRequest request) {
         PatientProfileResponse response = patientRegistrationService.registerPatient(request);
-        return ResponseEntity.created(URI.create("/patients/" + response.getPatientId()))
+        return ResponseEntity.created(URI.create("/patients/" + response.patientId()))
                 .body(response);
     }
 

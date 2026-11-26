@@ -5,52 +5,38 @@ import java.util.List;
 /**
  * RFC 7807 Problem Details for HTTP APIs.
  * Aligned with OpenAPI ErrorResponse schema.
+ * Implemented as a Java record with Lombok for immutable error responses.
  */
-public class ErrorResponse {
+public record ErrorResponse(
+        int status,
+        String title,
+        String detail,
+        String instance,
+        List<FieldError> errors
+) {
 
-    private int status;
-    private String title;
-    private String detail;
-    private String instance;
-    private List<FieldError> errors;
+    public record FieldError(
+            String field,
+            String message
+    ) {}
 
-    public ErrorResponse() {}
-
-    public ErrorResponse(int status, String title, String detail, String instance) {
-        this.status = status;
-        this.title = title;
-        this.detail = detail;
-        this.instance = instance;
+    public static ErrorResponse validationError(String instance, List<FieldError> errors) {
+        return new ErrorResponse(400, "Validation Error", "Invalid input data", instance, errors);
     }
 
-    public static class FieldError {
-        private String field;
-        private String message;
-
-        public FieldError() {}
-        public FieldError(String field, String message) {
-            this.field = field;
-            this.message = message;
-        }
-        public String getField() { return field; }
-        public void setField(String field) { this.field = field; }
-        public String getMessage() { return message; }
-        public void setMessage(String message) { this.message = message; }
+    public static ErrorResponse badRequest(String instance, String detail) {
+        return new ErrorResponse(400, "Bad Request", detail, instance, List.of());
     }
 
-    // Getters and Setters
-    public int getStatus() { return status; }
-    public void setStatus(int status) { this.status = status; }
+    public static ErrorResponse notFound(String instance, String detail) {
+        return new ErrorResponse(404, "Not Found", detail, instance, List.of());
+    }
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    public static ErrorResponse internalError(String instance, String detail) {
+        return new ErrorResponse(500, "Internal Server Error", detail, instance, List.of());
+    }
 
-    public String getDetail() { return detail; }
-    public void setDetail(String detail) { this.detail = detail; }
-
-    public String getInstance() { return instance; }
-    public void setInstance(String instance) { this.instance = instance; }
-
-    public List<FieldError> getErrors() { return errors; }
-    public void setErrors(List<FieldError> errors) { this.errors = errors; }
+    public static ErrorResponse badRequestWithDetail(int status, String title, String detail, String instance) {
+        return new ErrorResponse(status, title, detail, instance, List.of());
+    }
 }

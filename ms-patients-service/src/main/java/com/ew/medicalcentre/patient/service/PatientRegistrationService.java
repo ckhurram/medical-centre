@@ -37,18 +37,18 @@ public class PatientRegistrationService {
      */
     public PatientProfileResponse registerPatient(PatientRegistrationRequest request) {
         // Check if email already exists
-        if (patientRepository.existsByEmail(request.getEmail())) {
-            throw new PatientAlreadyExistsException("Email already registered: " + request.getEmail());
+        if (patientRepository.existsByEmail(request.email())) {
+            throw new PatientAlreadyExistsException("Email already registered: " + request.email());
         }
 
         // Build Patient record from request data (patientId + timestamps auto-generated)
         Patient patient = new Patient(
                 null,
-                request.getEmail(),
-                request.getFirstName(),
-                request.getLastName(),
-                LocalDate.parse(request.getDateOfBirth()),
-                request.getPhone(),
+                request.email(),
+                request.firstName(),
+                request.lastName(),
+                LocalDate.parse(request.dateOfBirth()),
+                request.phone(),
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
@@ -64,7 +64,8 @@ public class PatientRegistrationService {
                 savedPatient.lastName(),
                 savedPatient.dateOfBirth() != null ? savedPatient.dateOfBirth().toString() : "",
                 savedPatient.phone() != null ? savedPatient.phone() : "",
-                savedPatient.createdAt());
+                savedPatient.createdAt()
+        );
 
         // Publish event
         PatientRegisteredEvent event = new PatientRegisteredEvent(
@@ -73,7 +74,8 @@ public class PatientRegistrationService {
                 savedPatient.firstName(),
                 savedPatient.lastName(),
                 savedPatient.dateOfBirth() != null ? savedPatient.dateOfBirth().toString() : "",
-                savedPatient.phone() != null ? savedPatient.phone() : "");
+                savedPatient.phone() != null ? savedPatient.phone() : ""
+        );
 
         patientEventPublisher.publishPatientRegistered(event);
 

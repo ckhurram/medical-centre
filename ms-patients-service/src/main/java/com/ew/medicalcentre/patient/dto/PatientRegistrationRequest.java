@@ -10,44 +10,29 @@ import jakarta.validation.constraints.Size;
 /**
  * DTO for patient registration request.
  * Aligned with OpenAPI PatientRegistrationRequest schema.
+ *
+ * Implemented as a Java record with Lombok — immutable, with auto-generated
+ * accessors, equals, hashCode, and toString. Validation constraints remain
+ * on the record components for Spring validation.
  */
-public class PatientRegistrationRequest {
+public record PatientRegistrationRequest(
+        @Email(message = "Email must be valid")
+        @NotBlank(message = "Email is required")
+        String email,
 
-    @Email(message = "Email must be valid")
-    @NotBlank(message = "Email is required")
-    private String email;
+        @NotBlank(message = "First name is required")
+        @Size(min = 1, max = 50)
+        String firstName,
 
-    @NotBlank(message = "First name is required")
-    @Size(min = 1, max = 50)
-    private String firstName;
+        @NotBlank(message = "Last name is required")
+        @Size(min = 1, max = 50)
+        String lastName,
 
-    @NotBlank(message = "Last name is required")
-    @Size(min = 1, max = 50)
-    private String lastName;
+        @Past(message = "Date of birth must be in the past")
+        @NotNull(message = "Date of birth is required")
+        String dateOfBirth,
 
-    @Past(message = "Date of birth must be in the past")
-    @NotNull(message = "Date of birth is required")
-    private String dateOfBirth;
-
-    @Pattern(regexp = "^\\+?[1-9]\\d{1,14}$", message = "Phone must be in E.164 format")
-    private String phone;
-
-    // Default constructor
-    public PatientRegistrationRequest() {}
-
-    // Getters and Setters
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public String getFirstName() { return firstName; }
-    public void setFirstName(String firstName) { this.firstName = firstName; }
-
-    public String getLastName() { return lastName; }
-    public void setLastName(String lastName) { this.lastName = lastName; }
-
-    public String getDateOfBirth() { return dateOfBirth; }
-    public void setDateOfBirth(String dateOfBirth) { this.dateOfBirth = dateOfBirth; }
-
-    public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
+        @Pattern(regexp = "^\\+?[1-9]\\d{1,14}$", message = "Phone must be in E.164 format")
+        String phone
+) {
 }

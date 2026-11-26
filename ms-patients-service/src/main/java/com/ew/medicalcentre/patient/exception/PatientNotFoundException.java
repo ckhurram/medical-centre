@@ -1,8 +1,11 @@
 package com.ew.medicalcentre.patient.exception;
 
+import lombok.Getter;
+
 /**
  * Exception thrown when a patient is not found by ID.
  */
+@Getter
 public class PatientNotFoundException extends RuntimeException {
 
     private final String patientId;
@@ -11,6 +14,4 @@ public class PatientNotFoundException extends RuntimeException {
         super("Patient not found: " + patientId);
         this.patientId = patientId;
     }
-
-    public String getPatientId() { return patientId; }
 }
