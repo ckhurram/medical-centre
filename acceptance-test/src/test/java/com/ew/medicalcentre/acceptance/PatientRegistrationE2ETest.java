@@ -30,15 +30,15 @@ public class PatientRegistrationE2ETest {
     @Test
     @Order(1)
     void patientRegistrationEndToEnd() {
-        page.goto("http://localhost:3000/register");
+        page.navigate("http://localhost:3000/register");
 
-        page.fill("input[name='email']", "testpatient@example.com");
-        page.fill("input[name='firstName']", "John");
-        page.fill("input[name='lastName']", "Doe");
-        page.fill("input[name='dateOfBirth']", "1990-05-15");
-        page.fill("input[name='phone']", "+1234567890");
+        page.locator("input[name='email']").fill("testpatient@example.com");
+        page.locator("input[name='firstName']").fill("John");
+        page.locator("input[name='lastName']").fill("Doe");
+        page.locator("input[name='dateOfBirth']").fill("1990-05-15");
+        page.locator("input[name='phone']").fill("+1234567890");
 
-        page.click("button[type='submit']");
+        page.locator("button[type='submit']").click();
 
         page.waitForSelector(".success-message");
         assertThat(page.locator(".success-message")).isVisible();
@@ -48,12 +48,12 @@ public class PatientRegistrationE2ETest {
     @Test
     @Order(2)
     void patientLogin() {
-        page.goto("http://localhost:3000/login");
+        page.navigate("http://localhost:3000/login");
 
-        page.fill("input[name='email']", "testpatient@example.com");
-        page.fill("input[name='password']", "password123");
+        page.locator("input[name='email']").fill("testpatient@example.com");
+        page.locator("input[name='password']").fill("password123");
 
-        page.click("button[type='submit']");
+        page.locator("button[type='submit']").click();
 
         page.waitForSelector(".dashboard");
         assertThat(page.locator(".dashboard")).isVisible();
@@ -63,20 +63,19 @@ public class PatientRegistrationE2ETest {
     @Order(3)
     void patientBookAppointment() {
         // Login first
-        page.goto("http://localhost:3000/login");
-        page.fill("input[name='email']", "testpatient@example.com");
-        page.fill("input[name='password']", "password123");
-        page.click("button[type='submit']");
+        page.navigate("http://localhost:3000/login");
+        page.locator("input[name='email']").fill("testpatient@example.com");
+        page.locator("input[name='password']").fill("password123");
+        page.locator("button[type='submit']").click();
         page.waitForSelector(".dashboard");
 
         // Navigate to booking
-        page.goto("http://localhost:3000/book-appointment");
+        page.navigate("http://localhost:3000/book-appointment");
 
-        // Select medic
-        page.selectOption("select[name='medicId']", "medic-1");
-        page.fill("input[name='appointmentDateTime']", "2026-12-01T10:00");
+        page.locator("select[name='medicId']").selectOption("medic-1");
+        page.locator("input[name='appointmentDateTime']").fill("2026-12-01T10:00");
 
-        page.click("button[type='submit']");
+        page.locator("button[type='submit']").click();
 
         page.waitForSelector(".booking-confirmation");
         assertThat(page.locator(".booking-confirmation")).isVisible();

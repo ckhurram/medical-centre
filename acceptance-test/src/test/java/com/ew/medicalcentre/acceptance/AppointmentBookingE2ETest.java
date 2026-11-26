@@ -25,17 +25,17 @@ public class AppointmentBookingE2ETest {
     @Test
     @Order(1)
     void bookAppointmentEndToEnd() {
-        page.goto("http://localhost:3000/login");
-        page.fill("input[name='email']", "patient@example.com");
-        page.fill("input[name='password']", "password123");
-        page.click("button[type='submit']");
+        page.navigate("http://localhost:3000/login");
+        page.locator("input[name='email']").fill("patient@example.com");
+        page.locator("input[name='password']").fill("password123");
+        page.locator("button[type='submit']").click();
         page.waitForSelector(".dashboard");
 
-        page.goto("http://localhost:3000/book-appointment");
+        page.navigate("http://localhost:3000/book-appointment");
 
-        page.selectOption("select[name='medicId']", "medic-1");
-        page.fill("input[name='appointmentDateTime']", "2026-12-01T10:00");
-        page.click("button[type='submit']");
+        page.locator("select[name='medicId']").selectOption("medic-1");
+        page.locator("input[name='appointmentDateTime']").fill("2026-12-01T10:00");
+        page.locator("button[type='submit']").click();
 
         page.waitForSelector(".booking-confirmation");
         assertThat(page.locator(".booking-confirmation")).isVisible();
@@ -44,13 +44,13 @@ public class AppointmentBookingE2ETest {
     @Test
     @Order(2)
     void viewPatientAppointments() {
-        page.goto("http://localhost:3000/login");
-        page.fill("input[name='email']", "patient@example.com");
-        page.fill("input[name='password']", "password123");
-        page.click("button[type='submit']");
+        page.navigate("http://localhost:3000/login");
+        page.locator("input[name='email']").fill("patient@example.com");
+        page.locator("input[name='password']").fill("password123");
+        page.locator("button[type='submit']").click();
         page.waitForSelector(".dashboard");
 
-        page.goto("http://localhost:3000/appointments");
+        page.navigate("http://localhost:3000/appointments");
 
         page.waitForSelector(".appointment-list");
         assertThat(page.locator(".appointment-list")).isVisible();
@@ -60,16 +60,16 @@ public class AppointmentBookingE2ETest {
     @Test
     @Order(3)
     void cancelAppointment() {
-        page.goto("http://localhost:3000/login");
-        page.fill("input[name='email']", "patient@example.com");
-        page.fill("input[name='password']", "password123");
-        page.click("button[type='submit']");
+        page.navigate("http://localhost:3000/login");
+        page.locator("input[name='email']").fill("patient@example.com");
+        page.locator("input[name='password']").fill("password123");
+        page.locator("button[type='submit']").click();
         page.waitForSelector(".dashboard");
 
-        page.goto("http://localhost:3000/appointments");
+        page.navigate("http://localhost:3000/appointments");
         page.waitForSelector(".appointment-list");
 
-        page.click(".cancel-button");
+        page.locator(".cancel-button").click();
         page.waitForSelector(".cancellation-confirmation");
         assertThat(page.locator(".cancellation-confirmation")).isVisible();
     }

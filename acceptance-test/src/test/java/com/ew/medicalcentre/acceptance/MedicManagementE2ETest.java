@@ -25,21 +25,21 @@ public class MedicManagementE2ETest {
     @Test
     @Order(1)
     void adminRegisterMedic() {
-        page.goto("http://localhost:3000/admin/login");
-        page.fill("input[name='email']", "admin@example.com");
-        page.fill("input[name='password']", "admin123");
-        page.click("button[type='submit']");
+        page.navigate("http://localhost:3000/admin/login");
+        page.locator("input[name='email']").fill("admin@example.com");
+        page.locator("input[name='password']").fill("admin123");
+        page.locator("button[type='submit']").click();
         page.waitForSelector(".admin-dashboard");
 
-        page.goto("http://localhost:3000/admin/medics/new");
+        page.navigate("http://localhost:3000/admin/medics/new");
 
-        page.fill("input[name='firstName']", "Jane");
-        page.fill("input[name='lastName']", "Smith");
-        page.fill("input[name='email']", "jane.smith@hospital.com");
-        page.fill("input[name='specialization']", "Cardiology");
-        page.fill("input[name='qualification']", "MD, FACC");
+        page.locator("input[name='firstName']").fill("Jane");
+        page.locator("input[name='lastName']").fill("Smith");
+        page.locator("input[name='email']").fill("jane.smith@hospital.com");
+        page.locator("input[name='specialization']").fill("Cardiology");
+        page.locator("input[name='qualification']").fill("MD, FACC");
 
-        page.click("button[type='submit']");
+        page.locator("button[type='submit']").click();
 
         page.waitForSelector(".success-message");
         assertThat(page.locator(".success-message")).isVisible();
@@ -48,19 +48,19 @@ public class MedicManagementE2ETest {
     @Test
     @Order(2)
     void adminSetMedicAvailability() {
-        page.goto("http://localhost:3000/admin/login");
-        page.fill("input[name='email']", "admin@example.com");
-        page.fill("input[name='password']", "admin123");
-        page.click("button[type='submit']");
+        page.navigate("http://localhost:3000/admin/login");
+        page.locator("input[name='email']").fill("admin@example.com");
+        page.locator("input[name='password']").fill("admin123");
+        page.locator("button[type='submit']").click();
         page.waitForSelector(".admin-dashboard");
 
-        page.goto("http://localhost:3000/admin/medics/medic-1/availability");
+        page.navigate("http://localhost:3000/admin/medics/medic-1/availability");
 
-        page.selectOption("select[name='day']", "MONDAY");
-        page.fill("input[name='startTime']", "09:00");
-        page.fill("input[name='endTime']", "17:00");
+        page.locator("select[name='day']").selectOption("MONDAY");
+        page.locator("input[name='startTime']").fill("09:00");
+        page.locator("input[name='endTime']").fill("17:00");
 
-        page.click("button[type='submit']");
+        page.locator("button[type='submit']").click();
 
         page.waitForSelector(".success-message");
         assertThat(page.locator(".success-message")).isVisible();

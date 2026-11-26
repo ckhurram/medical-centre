@@ -18,6 +18,10 @@
     <properties>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
+        <!-- E2E tests require services running; skipped by default, enabled in CI acceptance-test stage -->
+        <skipTests>true</skipTests>
+        <!-- E2E module has no code coverage target; exclude from JaCoCo -->
+        <jacoco.skip>true</jacoco.skip>
     </properties>
 
     <dependencies>
