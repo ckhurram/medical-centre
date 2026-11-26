@@ -75,11 +75,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install and test frontend
         working-directory: ./medical-centre-ui
         run: |
+          ls -la package-lock.json
           npm ci
           npm run build
 
