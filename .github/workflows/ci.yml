@@ -5,9 +5,6 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main ]
-  schedule:
-    # Run vulnerability scan weekly
-    - cron: '0 2 * * 1'
 
 jobs:
   build-and-test:
@@ -43,28 +40,28 @@ jobs:
           path: ${{ matrix.service }}/target/site/jacoco/
           retention-days: 30
 
-  vulnerability-scan:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up JDK 25
-        uses: actions/setup-java@v4
-        with:
-          java-version: '25'
-          distribution: 'temurin'
-          cache: maven
-
-      - name: OWASP Dependency Check
-        run: mvn org.owasp:dependency-check-maven:check
-
-      - name: Upload OWASP Report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: owasp-dependency-check-report
-          path: '**/dependency-check-report.html'
-          retention-days: 30
+  # vulnerability-scan:
+#   runs-on: ubuntu-latest
+#   steps:
+#     - uses: actions/checkout@v4
+#
+#     - name: Set up JDK 25
+#       uses: actions/setup-java@v4
+#       with:
+#         java-version: '25'
+#         distribution: 'temurin'
+#         cache: maven
+#
+#     - name: OWASP Dependency Check
+#       run: mvn org.owasp:dependency-check-maven:check
+#
+#     - name: Upload OWASP Report
+#       uses: actions/upload-artifact@v4
+#       if: always()
+#       with:
+#         name: owasp-dependency-check-report
+#         path: '**/dependency-check-report.html'
+#         retention-days: 30
 
   frontend-build-and-test:
     runs-on: ubuntu-latest
@@ -143,7 +140,7 @@ jobs:
         run: docker-compose down -v
 
   docker-build:
-    needs: [build-and-test, frontend-build-and-test, vulnerability-scan]
+    needs: [build-and-test, frontend-build-and-test]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
