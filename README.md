@@ -61,6 +61,9 @@ medical-centre/
 ├── .env.example                       # Environment template
 ├── .gitignore
 ├── owasp-suppressions.xml             # CVE suppression rules
+├── checkstyle.xml                     # Code style rules
+├── spotbugs-exclude.xml               # SpotBugs exclusion rules
+├── owasp-suppressions.xml             # CVE suppression rules
 ├── .github/workflows/
 │   └── ci.yml                         # CI/CD pipeline
 │
@@ -149,7 +152,7 @@ medical-centre/
 │   │   ├── 002-event-driven-architecture.md
 │   │   ├── 003-schema-first-approach.md
 │   │   ├── 004-mongodb-per-service.md
-│   │   └── 005-keycloak-auth.md
+│   │   ├── 005-keycloak-auth.md
 │   ├── specs/                         # Spec-Driven Development
 │   │   ├── user-registration.md
 │   │   ├── medic-registration.md
@@ -157,9 +160,9 @@ medical-centre/
 │   ├── functional.md
 │   └── technical.md
 │
-└── deploy/
-    └── keycloak/
-        └── realm-export.json           # Keycloak realm config
+├── deploy/
+│   └── keycloak/
+│       └── realm-export.json           # Keycloak realm config
 ```
 
 ## Services Overview
@@ -174,20 +177,84 @@ medical-centre/
 | `ms-medics-service` | 8082 | Medic management | MongoDB |
 | `ms-notification-service` | 8083 | Event notifications | Kafka consumer |
 
-## Tech Stack
+## Technology Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React, TypeScript, Vite |
-| Backend | Java 25, Spring Boot 4.2.0 |
-| API Gateway | Spring Cloud 2025.0.0 |
-| Database | MongoDB 7 |
-| Messaging | Kafka (Confluent) |
-| Schema | OpenAPI 3.x, Avro 1.11 |
-| Auth | Keycloak (OAuth2/OIDC) |
-| Containerization | Docker, Docker Compose |
-| CI/CD | GitHub Actions |
-| Observability | OpenTelemetry, Micrometer, Jaeger, Prometheus, Loki, Grafana |
+### Core Platform
+| Layer | Technology | Version |
+|-------|------------|---------|
+| **Language** | Java | 25 (LTS) |
+| **Build Tool** | Maven | 3.9+ |
+| **Runtime** | Eclipse Temurin | 25 |
+
+### Backend Framework
+| Component | Technology | Version |
+|-----------|------------|---------|
+| **Core Framework** | Spring Boot | 4.2.0 |
+| **Cloud Framework** | Spring Cloud | 2025.0.0 |
+| **API Gateway** | Spring Cloud Gateway | 4.2.0 |
+| **Service Discovery** | Built-in (Spring Cloud) | — |
+| **Security** | Spring Security + Keycloak | 6.3+ / 26.0 |
+| **Validation** | Jakarta Validation (Hibernate Validator) | 8.0+ |
+| **Actuator/Monitoring** | Micrometer + Prometheus | 1.14+ |
+
+### Data & Persistence
+| Component | Technology | Version |
+|-----------|------------|---------|
+| **Primary Database** | MongoDB | 7.x |
+| **ODM** | Spring Data MongoDB | 4.2.0 |
+| **Messaging** | Apache Kafka | 3.8+ (Confluent) |
+| **Kafka Client** | Spring Kafka | 4.2.0 |
+| **Schema Registry** | Avro | 1.11.3 |
+| **API Specs** | OpenAPI | 3.1 |
+
+### Frontend
+| Layer | Technology | Version |
+|-------|------------|---------|
+| **Framework** | React | 18.3 |
+| **Language** | TypeScript | 5.6 |
+| **Build Tool** | Vite | 5.4 |
+| **Router** | React Router DOM | 6.27 |
+| **HTTP Client** | Axios | 1.7 |
+| **Styling** | Tailwind CSS | 3.4 |
+| **State Management** | React Hooks / Context | — |
+| **Testing** | Playwright | 1.65 |
+
+### Observability Stack
+| Signal | Technology | Version |
+|--------|------------|---------|
+| **Tracing** | OpenTelemetry (JS + Java Agent) | 1.30+ / 1.40+ |
+| **Trace Backend** | Jaeger | 1.58+ |
+| **Metrics** | Micrometer + Prometheus | 1.14+ / 2.54+ |
+| **Logs** | Loki + Promtail | 3.1+ |
+| **Visualization** | Grafana | 11.0+ |
+| **Collector** | OpenTelemetry Collector | 0.122+ |
+
+### Build & CI/CD
+| Tool | Technology | Version |
+|------|------------|---------|
+| **Build Tool** | Maven | 3.9+ |
+| **Containerization** | Docker | 24.0+ |
+| **Orchestration** | Docker Compose | 2.27+ |
+| **CI/CD** | GitHub Actions | — |
+| **Vulnerability Scanning** | OWASP Dependency Check | 11.1 |
+| **Code Style** | Checkstyle | 3.3 |
+| **Static Analysis** | SpotBugs | 4.8.6 |
+| **Coverage** | JaCoCo | 0.8.14 |
+
+### Testing
+| Tier | Tool | Scope |
+|------|------|-------|
+| Unit + Coverage | JUnit 5 + JaCoCo (80%) | Service logic |
+| API BDD | Cucumber + RestAssured | REST endpoints |
+| E2E Acceptance | Playwright | Full UI flows |
+
+### Development & Quality
+| Tool | Technology |
+|------|------------|
+| **IDE Support** | Lombok 1.18.42 |
+| **Code Style** | Checkstyle 3.3.1 |
+| **Static Analysis** | SpotBugs 4.8.6 |
+| **Dependency Scanning** | OWASP Dependency Check 11.1 |
 
 ## Observability
 
@@ -290,3 +357,4 @@ cd acceptance-test && mvn test
 - [Spec-Driven Development](docs/specs/)
 - [Patient Service Testing](ms-patients-service/TESTING.md)
 - [Acceptance Tests](acceptance-test/README.md)
+- [Observability Stack](shared/observability/README.md)
