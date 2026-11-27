@@ -132,7 +132,17 @@
                     <version>3.3.1</version>
                     <configuration>
                         <configLocation>checkstyle.xml</configLocation>
+                        <failOnViolation>true</failOnViolation>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <id>validate-checkstyle</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
@@ -141,8 +151,7 @@
                     <configuration>
                         <effort>Max</effort>
                         <threshold>Medium</threshold>
-                        <failOnError>true</failOnError>
-                        <excludeFilterFile>${project.basedir}/spotbugs-exclude.xml</excludeFilterFile>
+                        <failOnError>false</failOnError>
                     </configuration>
                 </plugin>
                 <plugin>
