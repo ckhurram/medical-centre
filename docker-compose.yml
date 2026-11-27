@@ -79,10 +79,9 @@ services:
     command: ["-config.file=/etc/loki/loki-config.yml"]
     volumes:
       - ./shared/observability/loki-config.yml:/etc/loki/loki-config.yml
+      - loki-data:/loki
     ports:
       - "3100:3100"
-    volumes:
-      - loki-data:/loki
 
   # Promtail — ships container logs to Loki
   promtail:
