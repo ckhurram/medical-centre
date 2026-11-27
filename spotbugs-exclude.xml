@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- Exclude generated/Avro code -->
+    <Match>
+        <Package name="com.ew.medicalcentre.*.event.*"/>
+    </Match>
+    <!-- Exclude test classes -->
+    <Match>
+        <Class name="~.*Test"/>
+    </Match>
+</FindBugsFilter>

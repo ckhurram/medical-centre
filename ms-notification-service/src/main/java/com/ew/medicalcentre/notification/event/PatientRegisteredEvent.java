@@ -1,11 +1,22 @@
 package com.ew.medicalcentre.notification.event;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.Instant;
 
 /**
  * Event consumed when a patient is registered.
  * Matches Avro schema: shared/schemas/avro/patient-registered.avsc
+ *
+ * Uses Lombok to generate constructors, getters and setters.
  */
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class PatientRegisteredEvent {
 
     private String patientId;
@@ -16,10 +27,9 @@ public class PatientRegisteredEvent {
     private String phone;
     private long occurredAt;
 
-    public PatientRegisteredEvent() {
-        this.occurredAt = Instant.now().toEpochMilli();
-    }
-
+    /**
+     * Convenience constructor that stamps occurredAt with the current time.
+     */
     public PatientRegisteredEvent(String patientId, String email, String firstName,
                                   String lastName, String dateOfBirth, String phone) {
         this.patientId = patientId;
@@ -30,26 +40,4 @@ public class PatientRegisteredEvent {
         this.phone = phone;
         this.occurredAt = Instant.now().toEpochMilli();
     }
-
-    // Getters and Setters
-    public String getPatientId() { return patientId; }
-    public void setPatientId(String patientId) { this.patientId = patientId; }
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public String getFirstName() { return firstName; }
-    public void setFirstName(String firstName) { this.firstName = firstName; }
-
-    public String getLastName() { return lastName; }
-    public void setLastName(String lastName) { this.lastName = lastName; }
-
-    public String getDateOfBirth() { return dateOfBirth; }
-    public void setDateOfBirth(String dateOfBirth) { this.dateOfBirth = dateOfBirth; }
-
-    public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
-
-    public long getOccurredAt() { return occurredAt; }
-    public void setOccurredAt(long occurredAt) { this.occurredAt = occurredAt; }
 }

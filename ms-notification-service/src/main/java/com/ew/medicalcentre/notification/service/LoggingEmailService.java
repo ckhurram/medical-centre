@@ -1,8 +1,7 @@
 package com.ew.medicalcentre.notification.service;
 
 import com.ew.medicalcentre.notification.event.PatientRegisteredEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -10,11 +9,10 @@ import org.springframework.stereotype.Service;
  * Development email service that logs welcome emails instead of sending them.
  * Default service (active unless the "smtp" profile is enabled).
  */
+@Slf4j
 @Service
 @Profile("!smtp")
 public class LoggingEmailService implements EmailService {
-
-    private static final Logger log = LoggerFactory.getLogger(LoggingEmailService.class);
 
     @Override
     public void sendWelcomeEmail(PatientRegisteredEvent event) {

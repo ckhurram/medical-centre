@@ -3,8 +3,8 @@ package com.ew.medicalcentre.notification.service;
 import com.ew.medicalcentre.notification.event.PatientRegisteredEvent;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -14,17 +14,13 @@ import org.springframework.stereotype.Service;
  * Production email service that sends welcome emails via SMTP.
  * Active when the "smtp" profile is enabled.
  */
+@Slf4j
 @Service
 @Profile("smtp")
+@RequiredArgsConstructor
 public class SmtpEmailService implements EmailService {
 
-    private static final Logger log = LoggerFactory.getLogger(SmtpEmailService.class);
-
     private final JavaMailSender javaMailSender;
-
-    public SmtpEmailService(JavaMailSender javaMailSender) {
-        this.javaMailSender = javaMailSender;
-    }
 
     @Override
     public void sendWelcomeEmail(PatientRegisteredEvent event) {

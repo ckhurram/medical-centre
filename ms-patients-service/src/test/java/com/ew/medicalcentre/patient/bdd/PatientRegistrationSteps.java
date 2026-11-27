@@ -8,7 +8,6 @@ import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 public class PatientRegistrationSteps {
@@ -20,6 +19,22 @@ public class PatientRegistrationSteps {
     public void the_patient_service_is_running() {
         RestAssured.baseURI = System.getenv().getOrDefault("PATIENTS_SERVICE_URL", "http://localhost:8080");
         request = given().contentType("application/json");
+    }
+
+    @Given("a patient already exists with email {string}")
+    public void a_patient_already_exists_with_email(String email) {
+        // Pre-create the patient by posting a registration request
+        given()
+                .contentType("application/json")
+                .body("{"
+                        + "\"email\": \"" + email + "\","
+                        + "\"firstName\": \"Existing\","
+                        + "\"lastName\": \"Patient\","
+                        + "\"dateOfBirth\": \"1980-01-01\","
+                        + "\"phone\": \"+15550000000\""
+                        + "}")
+                .when()
+                .post("/api/v1/patients");
     }
 
     @When("I send a registration request with valid details")
