@@ -160,10 +160,10 @@ jobs:
 
       - name: Build service images
         run: |
-          docker build -t medical-centre-api-gateway ./ms-api-gateway
-          docker build -t medical-centre-patients ./ms-patients-service
-          docker build -t medical-centre-medics ./ms-medics-service
-          docker build -t medical-centre-appointments ./ms-appointments-service
-          docker build -t medical-centre-notification ./ms-notification-service
-          docker build -t medical-centre-identity ./ms-identity-service
+          docker build -f ms-api-gateway/Dockerfile -t medical-centre-api-gateway .
+          docker build -f ms-patients-service/Dockerfile -t medical-centre-patients .
+          docker build -f ms-medics-service/Dockerfile -t medical-centre-medics .
+          docker build -f ms-appointments-service/Dockerfile -t medical-centre-appointments .
+          docker build -f ms-notification-service/Dockerfile -t medical-centre-notification .
+          docker build -f ms-identity-service/Dockerfile -t medical-centre-identity .
           docker build -t medical-centre-ui ./medical-centre-ui

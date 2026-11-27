@@ -142,8 +142,8 @@ services:
   # ──────────────────────────────────────────────
   ms-api-gateway:
     build:
-      context: ./ms-api-gateway
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ms-api-gateway/Dockerfile
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080/auth
@@ -159,8 +159,8 @@ services:
 
   ms-identity-service:
     build:
-      context: ./ms-identity-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ms-identity-service/Dockerfile
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - KEYCLOAK_AUTH_SERVER_URL=http://keycloak:8080/auth
@@ -173,8 +173,8 @@ services:
 
   ms-patients-service:
     build:
-      context: ./ms-patients-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ms-patients-service/Dockerfile
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
@@ -191,8 +191,8 @@ services:
 
   ms-medics-service:
     build:
-      context: ./ms-medics-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ms-medics-service/Dockerfile
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - MONGODB_URI=mongodb://admin:password@mongodb:27017/medical-centre-medics?authSource=admin
@@ -207,8 +207,8 @@ services:
 
   ms-appointments-service:
     build:
-      context: ./ms-appointments-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ms-appointments-service/Dockerfile
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
@@ -225,8 +225,8 @@ services:
 
   ms-notification-service:
     build:
-      context: ./ms-notification-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ms-notification-service/Dockerfile
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
