@@ -96,12 +96,21 @@ jobs:
       - name: Build all services
         run: mvn clean package -DskipTests
 
+      - name: Start Docker daemon
+        run: |
+          # Start Docker daemon if not running (required for Docker Compose v2)
+          if ! docker info >/dev/null 2>&1; then
+            sudo systemctl start docker || true
+            sleep 5
+          fi
+
       - name: Start infrastructure and services with Docker Compose
         run: |
-          docker-compose up -d --build kafka mongodb keycloak
+          # Use Docker Compose V2 (docker compose) instead of deprecated docker-compose
+          docker compose up -d --build kafka mongodb keycloak
           # Wait for infrastructure to be ready
           sleep 30
-          docker-compose up -d --build ms-patients-service ms-medics-service ms-appointments-service ms-notification-service medical-centre-ui
+          docker compose up -d --build ms-patients-service ms-medics-service ms-appointments-service ms-notification-service medical-centre-ui
           # Wait for services to be healthy
           sleep 30
 
@@ -137,7 +146,7 @@ jobs:
 
       - name: Stop Docker Compose
         if: always()
-        run: docker-compose down -v
+        run: docker compose down -v
 
   docker-build:
     needs: [build-and-test, frontend-build-and-test]
